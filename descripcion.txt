@@ -1,0 +1,30 @@
+SOUNDBAR - Visualizador de espectro de audio para polybar
+==========================================================
+
+DESCRIPCION
+-----------
+Fork de lookas (visualizador de audio en Rust) sin interfaz terminal,
+que emite el mismo raw output que cava (valores 0-7 separados por ';')
+para integrarse en polybar usando ~4 MB de RAM en lugar de los ~15 MB
+de cava.
+
+TECNOLOGIA: Rust (cpal, realfft, serde/toml)
+PRIORIDAD: 3 (Proyectos en Rust)
+
+FUNCIONALIDADES
+---------------
+[x] Captura de audio del sistema en tiempo real
+[x] FFT para calcular el espectro de frecuencias
+[x] Salida raw estilo cava: v;v;v;...;v por frame (default 0-7)
+[x] Flags CLI: --bars, --levels, --fps, --mic/--system/--both
+[x] Microfono: --mic o --both (por defecto sistema, con fallback a microfono)
+[x] Autosens adaptativo (heredado de lookas: gate, flow/spring)
+[x] Bajo consumo: ~3.9 MB RSS vs ~15 MB de cava
+[x] Soporte PipeWire/PulseAudio (cpal)
+[x] Empaquetado (cargo install) e instalado en ~/.cargo/bin
+[x] Subido a GitHub como repositorio "soundbar"
+
+PLANIFICADO / POR ANIADIR
+--------------------------
+[ ] Modo estereo / mono
+[ ] Integrar en la barra principal si la prueba final es buena
