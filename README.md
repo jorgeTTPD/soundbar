@@ -42,10 +42,12 @@ cargo install --path .
 
 ### Polybar integration
 
-Put this in your bar config (or use the provided example config):
+Create a wrapper script that pipes `soundbar` into a FIFO and maps the `0-7`
+values to `▂▃▄▅▆▇█` characters, exactly like the classic `cava.sh`, then use it
+in your bar config:
 
 ```ini
-[module/cava]
+[module/soundbar]
 type = custom/script
 exec = ~/.config/polybar/scripts/soundbar.sh
 tail = true
@@ -53,14 +55,38 @@ format = <label>
 label = %output%
 ```
 
-The `soundbar.sh` script in this repo pipes `soundbar` into a FIFO and maps the
-`0-7` values to `▂▃▄▅▆▇█` characters, exactly like the classic `cava.sh`.
-
-To test it without touching your main bar, run a second bar:
+Example wrapper script:
 
 ```sh
-polybar -c ~/.config/polybar/config-soundbar.ini soundbar_test
+#!/usr/bin/env bash
+
+FIFO="/tmp/soundbar.fifo"
+PIDFILE="/tmp/soundbar.pid"
+
+if [ ! -p "$FIFO" ]; then
+    mkfifo "$FIFO"
+fi
+
+if ! kill -0 "$(cat "$PIDFILE" 2>/dev/null)" 2>/dev/null; then
+    soundbar --bars 8 > "$FIFO" 2>&1 &
+    echo $! > "$PIDFILE"
+fi
+
+while read -r line < "$FIFO"; do
+    bars=" ▂▃▄▅▆▇█"
+    output=""
+    IFS=';' read -ra values <<< "$line"
+    for v in "${values[@]}"; do
+        if [ "$v" -ge 0 ] && [ "$v" -le 7 ]; then
+            output+="${bars:$v:1}"
+        else
+            output+=" "
+        fi
+    done
+    echo "$output"
+done
 ```
+
 
 ## RAM comparison
 
